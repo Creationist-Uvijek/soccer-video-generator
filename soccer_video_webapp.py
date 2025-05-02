@@ -19,26 +19,26 @@ def generate_script(position):
     prompt = f"""Write a 1-minute script for an animated video for kids aged 8-10.
     The video explains the role of a {position} in a soccer team using fun, friendly language,
     short sentences, and exciting tone. Include a few silly jokes or playful moments."""
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
         max_tokens=300
     )
-    return response['choices'][0]['message']['content']
+    return response.choices[0].message.content
 
 def generate_audio(script_text, audio_path):
     tts = gTTS(text=script_text, lang='en')
     tts.save(audio_path)
 
 def generate_image(prompt, image_path):
-    response = openai.Image.create(
+    response = openai.images.generate(
         prompt=prompt,
         n=1,
         size="512x512",
         response_format="url"
     )
-    image_url = response['data'][0]['url']
+    image_url = response.data[0].url
     img_data = requests.get(image_url).content
     with open(image_path, 'wb') as f:
         f.write(img_data)
@@ -52,7 +52,10 @@ def generate_assets(position):
         f.write(script)
 
     generate_audio(script, f"{base_path}_audio.mp3")
-    generate_image(f"Cartoon-style drawing of a {position} in a kids soccer match, fun and colourful", f"{base_path}_image.jpg")
+    generate_image(
+        f"Cartoon-style drawing of a {position} in a kids soccer match, fun and colourful",
+        f"{base_path}_image.jpg"
+    )
 
     return base_path, script
 
@@ -85,4 +88,3 @@ if st.button("Generate Content"):
 
         with open(f"{base_path}_script.txt", "rb") as f:
             st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
-
