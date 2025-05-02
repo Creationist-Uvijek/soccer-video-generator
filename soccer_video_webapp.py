@@ -19,8 +19,9 @@ def generate_script(position):
     prompt = f"""Write a 1-minute script for an animated video for kids aged 8-10.
     The video explains the role of a {position} in a soccer team using fun, friendly language,
     short sentences, and exciting tone. Include a few silly jokes or playful moments."""
+
     response = openai.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",  # more broadly available than gpt-4
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
         max_tokens=300
