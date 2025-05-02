@@ -82,7 +82,7 @@ if st.button("Generate Content"):
             st.markdown(script)
 
             with open(f"{base_path}_audio.mp3", "rb") as f:
-                st.download_button(, "rb") as f:
+                st.download_button("Download Narration (MP3)", data=f, file_name=os.path.basename(f.name))
                 st.download_button("Download Image (JPG)", data=f, file_name=os.path.basename(f.name))
 
             with open(f"{base_path}_script.txt", "rb") as f:
@@ -90,11 +90,8 @@ if st.button("Generate Content"):
     except Exception as e:
         st.error("An error occurred while generating content. Please check your API key, model access, or try again later.")
         st.exception(e)
-"Download Narration (MP3)", data=f, file_name=os.path.basename(f.name))
-
         with open(f"{base_path}_image.jpg", "rb") as f:
             st.download_button("Download Image (JPG)", data=f, file_name=os.path.basename(f.name))
 
         with open(f"{base_path}_script.txt", "rb") as f:
             st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
-
