@@ -21,7 +21,9 @@ try:
 except Exception:
     st.error("OpenAI API key not found or misconfigured in secrets. Please check your Streamlit secrets.")
     st.stop()
-
+except Exception:
+    st.error("OpenAI API key not found in secrets. Please add it via 'st.secrets'.")
+    st.stop()
 os.makedirs("output", exist_ok=True)
 
 POSITIONS = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Captain"]
@@ -70,8 +72,14 @@ def generate_assets(position):
     except openai.RateLimitError:
         script = f"Hi! I'm the {position}, and I'm here to help our team. I block, pass, and play fair! (This is a demo script because the OpenAI quota has been reached.)"
         generate_audio(script, f"{base_path}_audio.mp3")
-        placeholder_img_url = f"https://via.placeholder.com/512x512.png?text=Soccer+{position}"
-        img_data = requests.get(placeholder_img_url).content
+        from PIL import Image
+import io
+
+        # Create a simple placeholder image using PIL
+        placeholder = Image.new("RGB", (512, 512), color=(240, 240, 240))
+        img_byte_arr = io.BytesIO()
+        placeholder.save(img_byte_arr, format='PNG')
+        img_data = img_byte_arr.getvalue()
         with open(f"{base_path}_image.jpg", 'wb') as f:
             f.write(img_data)
     except Exception as e:
@@ -112,12 +120,11 @@ if st.button("Generate Content"):
                 with col2:
                     st.download_button("🖼️ Download Image (JPG)", data=f_image, file_name=os.path.basename(f_image.name))
 
-            with open(f"{base_path}_script.txt", "rb") as f_script:
-                st.download_button("📄 Download Script (TXT)", data=f_script, file_name=os.path.basename(f_script.name))
-
-    except openai.RateLimitError:
-        st.error("❗ You have exceeded your OpenAI quota. Visit https://platform.openai.com/account/usage to review your usage.")
+            with open(f"{base_path}_script.txt", "rb") as f:
+                st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
+    except openai.RateLimitError as e:
+        st.error("You have exceeded your OpenAI quota. Please check your usage at https://platform.openai.com/account/usage and ensure your billing is active.")
         st.stop()
     except Exception as e:
-        st.error("⚠️ An error occurred while generating content. Please check your API key, billing, or try again later.")
+        st.error("An error occurred while generating content. Please check your API key, model access, or try again later.")
         st.exception(e)
