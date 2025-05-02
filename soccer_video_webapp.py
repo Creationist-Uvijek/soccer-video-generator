@@ -57,7 +57,7 @@ def generate_assets(position):
     return base_path, script
 
 # ========== STREAMLIT UI ==========
-st.title("\ud83c\udfc0 Soccer Explainer Audio + Visual Generator for Kids")
+st.title("Soccer Explainer Audio + Visual Generator for Kids")
 
 st.markdown("""
 Create a fun mini-lesson to explain soccer positions to kids under 11! 
