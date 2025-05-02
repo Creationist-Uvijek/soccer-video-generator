@@ -117,5 +117,5 @@ if st.button("Generate Content"):
         st.stop()
     except Exception as e:
         st.error("An error occurred while generating content. Please check your API key, model access, or try again later.")
-        st.exception(e)        with open(f"{base_path}_script.txt", "rb") as f:
+        st.exception(e)
             st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
