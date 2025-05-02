@@ -19,9 +19,8 @@ def generate_script(position):
     prompt = f"""Write a 1-minute script for an animated video for kids aged 8-10.
     The video explains the role of a {position} in a soccer team using fun, friendly language,
     short sentences, and exciting tone. Include a few silly jokes or playful moments."""
-
     response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",  # more broadly available than gpt-4
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
         max_tokens=300
@@ -71,21 +70,33 @@ This app uses AI to generate a script, narration, and image — ready to share.
 selected_position = st.selectbox("Choose a position:", POSITIONS)
 
 if st.button("Generate Content"):
-    with st.spinner("Generating content... this may take up to 1 minute"):
-        base_path, script = generate_assets(selected_position)
-        st.success("Content generated successfully!")
+    try:
+        with st.spinner("Generating content... this may take up to 1 minute"):
+            base_path, script = generate_assets(selected_position)
+            st.success("Content generated successfully!")
 
-        st.image(f"{base_path}_image.jpg", caption=selected_position, use_column_width=True)
-        st.audio(f"{base_path}_audio.mp3")
+            st.image(f"{base_path}_image.jpg", caption=selected_position, use_column_width=True)
+            st.audio(f"{base_path}_audio.mp3")
 
-        st.markdown("### Script")
-        st.markdown(script)
+            st.markdown("### Script")
+            st.markdown(script)
 
-        with open(f"{base_path}_audio.mp3", "rb") as f:
-            st.download_button("Download Narration (MP3)", data=f, file_name=os.path.basename(f.name))
+            with open(f"{base_path}_audio.mp3", "rb") as f:
+                st.download_button("Download Narration (MP3)", data=f, file_name=os.path.basename(f.name))
+
+            with open(f"{base_path}_image.jpg", "rb") as f:
+                st.download_button("Download Image (JPG)", data=f, file_name=os.path.basename(f.name))
+
+            with open(f"{base_path}_script.txt", "rb") as f:
+                st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
+    except Exception as e:
+        st.error("An error occurred while generating content. Please check your API key, model access, or try again later.")
+        st.exception(e)
+"Download Narration (MP3)", data=f, file_name=os.path.basename(f.name))
 
         with open(f"{base_path}_image.jpg", "rb") as f:
             st.download_button("Download Image (JPG)", data=f, file_name=os.path.basename(f.name))
 
         with open(f"{base_path}_script.txt", "rb") as f:
             st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
+
