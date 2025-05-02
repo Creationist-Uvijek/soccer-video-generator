@@ -62,15 +62,25 @@ def generate_assets(position):
     safe_name = position.lower().replace(" ", "_")
     base_path = f"output/{safe_name}"
 
-    script = generate_script(position)
+    try:
+        script = generate_script(position)
+        generate_audio(script, f"{base_path}_audio.mp3")
+        generate_image(
+            f"Cartoon-style drawing of a {position} in a kids soccer match, fun and colourful",
+            f"{base_path}_image.jpg"
+        )
+    except openai.RateLimitError:
+        script = f"Hi! I'm the {position}, and I'm here to help our team. I block, pass, and play fair! (This is a demo script because the OpenAI quota has been reached.)"
+        generate_audio(script, f"{base_path}_audio.mp3")
+        placeholder_img_url = "https://via.placeholder.com/512x512.png?text=Soccer+{position}"
+        img_data = requests.get(placeholder_img_url).content
+        with open(f"{base_path}_image.jpg", 'wb') as f:
+            f.write(img_data)
+    except Exception as e:
+        raise e
+
     with open(f"{base_path}_script.txt", "w") as f:
         f.write(script)
-
-    generate_audio(script, f"{base_path}_audio.mp3")
-    generate_image(
-        f"Cartoon-style drawing of a {position} in a kids soccer match, fun and colourful",
-        f"{base_path}_image.jpg"
-    )
 
     return base_path, script
 
@@ -102,10 +112,12 @@ if st.button("Generate Content"):
 
             with open(f"{base_path}_script.txt", "rb") as f:
                 st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
+    except openai.RateLimitError as e:
+        st.error("You have exceeded your OpenAI quota. Please check your usage at https://platform.openai.com/account/usage and ensure your billing is active.")
+        st.stop()
     except Exception as e:
         st.error("An error occurred while generating content. Please check your API key, model access, or try again later.")
         st.exception(e)
-        with open(f"{base_path}_image.jpg", "rb") as f:
             st.download_button("Download Image (JPG)", data=f, file_name=os.path.basename(f.name))
 
         with open(f"{base_path}_script.txt", "rb") as f:
