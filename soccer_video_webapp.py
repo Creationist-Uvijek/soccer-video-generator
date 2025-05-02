@@ -9,10 +9,18 @@ import streamlit as st
 # ========== CONFIGURATION ==========
 # Use Streamlit secrets to load the OpenAI API key securely
 try:
-    openai.api_key = st.secrets["openai_api_key"]
+    api_key = (
+        st.secrets["openai_api_key"]["openai_api_key"]
+        if isinstance(st.secrets["openai_api_key"], dict)
+        else st.secrets["openai_api_key"]
+    )
+    openai.api_key = api_key
     if not openai.api_key or not openai.api_key.startswith("sk-"):
         st.error("Invalid OpenAI API key format. Please update your secrets in Streamlit Cloud.")
         st.stop()
+except Exception:
+    st.error("OpenAI API key not found or misconfigured in secrets. Please check your Streamlit secrets.")
+    st.stop()
 except Exception:
     st.error("OpenAI API key not found in secrets. Please add it via 'st.secrets'.")
     st.stop()
