@@ -8,7 +8,14 @@ import streamlit as st
 
 # ========== CONFIGURATION ==========
 # Use Streamlit secrets to load the OpenAI API key securely
-openai.api_key = st.secrets["openai_api_key"]
+try:
+    openai.api_key = st.secrets["openai_api_key"]
+    if not openai.api_key or not openai.api_key.startswith("sk-"):
+        st.error("Invalid OpenAI API key format. Please update your secrets in Streamlit Cloud.")
+        st.stop()
+except Exception:
+    st.error("OpenAI API key not found in secrets. Please add it via 'st.secrets'.")
+    st.stop()
 os.makedirs("output", exist_ok=True)
 
 POSITIONS = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Captain"]
@@ -95,3 +102,4 @@ if st.button("Generate Content"):
 
         with open(f"{base_path}_script.txt", "rb") as f:
             st.download_button("Download Script (TXT)", data=f, file_name=os.path.basename(f.name))
+
