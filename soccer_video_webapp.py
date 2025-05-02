@@ -73,8 +73,7 @@ def generate_assets(position):
         script = f"Hi! I'm the {position}, and I'm here to help our team. I block, pass, and play fair! (This is a demo script because the OpenAI quota has been reached.)"
         generate_audio(script, f"{base_path}_audio.mp3")
         from PIL import Image
-import io
-
+        import io
         # Create a simple placeholder image using PIL
         placeholder = Image.new("RGB", (512, 512), color=(240, 240, 240))
         img_byte_arr = io.BytesIO()
